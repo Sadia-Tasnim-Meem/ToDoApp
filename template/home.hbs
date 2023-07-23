@@ -1,0 +1,98 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To Do Application</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body>
+      <style>
+         .btn {
+    background: linear-gradient(45deg, cornflowerblue, violet);
+}
+    </style>
+
+    <div className="App">
+        <section class="">
+            <div class="container-fluid ">
+                <div class="row">
+                    <div class="col-md-12 ">
+
+                        <div class="d-flex  justify-content-between shadow-lg p-3 bg-body rounded align-items-center">
+                            <p class="h1 text-start">
+                                Tasks To Do
+                            </p>
+                            <p class="align-self-center logout-img">
+                                <a href="/logout"><img src="/img/logout.svg" alt="Logout"></a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container py-5">
+
+                <div class="row d-flex justify-content-center align-items-center">
+                    <div class="col-md-8 offset-md-0">
+
+
+
+                        <div class="pb-2">
+                            <form action="/todo/create" method="post">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control form-control-lg"
+                                        id="exampleFormControlInput1" required placeholder="Title" name="title" />
+                                    <textarea class="form-control mt-2" id="exampleFormControlTextarea1" rows="3"
+                                        name="content" placeholder="Write content..." required></textarea>
+                                    <input type="hidden" name="users_id" value="{{userId}}">
+                                    <button type="submit" class="btn btn-primary btn-lg mt-2">Add</button>
+                                </div>
+                            </form>
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    {{#each todos}}
+                    <div class="col-md-3 mb-3">
+                        
+
+                        <div class="card" >
+                          
+                          <div class="card-body">
+                            <div class="card-title clearfix"><h5 class="float-start">{{ this.title }}</h5> <span class="float-end">
+ <a href="/todo/edit/{{this.id}}" class="text-primary" data-mdb-toggle="tooltip"
+                                        title="Edit todo"><i class="fas fa-pencil-alt me-3"></i></a>
+                                    <a href="/todo/delete/{{this.id}}" class="text-danger mx-2"
+                                        data-mdb-toggle="tooltip" title="Delete todo"><i
+                                            class="fas fa-trash-alt"></i></a>
+                            </span></div>
+                            <p class="card-text"> {{ this.content }}</p>  
+                          </div>
+                        </div>
+                        
+                    </div>
+
+
+                    {{/each}}
+                </div>
+
+
+            </div>
+        </section>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
