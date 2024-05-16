@@ -287,6 +287,9 @@ app.get("/todo/delete/:id", (req, res) => {
 
 //app.listen(5000,'localhost');
 
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
+
 app.listen(port, () => {
     console.log('port connected');
 })
