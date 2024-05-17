@@ -1,5 +1,6 @@
 const express = require("express")
-const mysql = require("mysql")
+//const mysql = require("mysql")
+const Pool = require("pg").Pool;
 const path = require("path")
 const app = express()
 const bcrypt = require('bcrypt');
@@ -60,20 +61,26 @@ const generateToken = (userId) => {
     }
   };
   
-
+/*
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
     database: "todolist"
 });
+*/
+
+const db = new Pool({
+  connectionString:`postgres://postgres.zvzroaezcikcmsgsalnj:peyQdrx3ACmOJEDc@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres`
+})
 
 // Connect to MySQL
 db.connect(err => {
     if (err) {
         throw err;
     }
-    console.log("Connected to MySQL");
+    //console.log("Connected to MySQL");
+    console.log("Connected to Supabase.")
 });
 
 
@@ -127,7 +134,7 @@ app.get('/login', (req, res) => {
 
     const userId = req.session.userId;
     
-    const sql = "SELECT * FROM todos WHERE users_id = ? ORDER BY id DESC";
+    const sql = `SELECT * FROM todos WHERE users_id = $1 ORDER BY id DESC;`;
     db.query(sql, [userId], (err, result) => {
       if (err) {
         console.log(err);
@@ -149,14 +156,17 @@ app.post('/user/register', (req, res) => {
         return res.status(500).json({ error: 'Error hashing password' });
       }
   
-      const sql = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
+      const sql = `INSERT INTO users (name, email, password) VALUES ($1, $2, $3);`;
       const values = [name, email, hashedPassword];
-  
+      //const sql = `INSERT INTO users (name, email, password) VALUES (${name}, ${email}, ${hashedPassword});`;
+      
+      
       db.query(sql, values, (err, result) => {
         if (err) {
           console.log(err);
           return res.status(500).json({ error: 'Error inserting data into MySQL' });
         }
+        
 
         req.session.userId = result.insertId;
   
@@ -177,10 +187,12 @@ app.post('/user/register', (req, res) => {
 app.post('/user/login', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    const sql = 'SELECT * FROM users WHERE email = ?';
+    console.log(password);
+    const sql = `SELECT * FROM users WHERE email = $1;`;
   
     db.query(sql, [email], (err, result) => {
       if (err) {
+        console.log("eikhane jhamela");
         console.log(err);
         return res.status(500).json({ error: 'Error executing MySQL query' });
       }
@@ -189,8 +201,10 @@ app.post('/user/login', (req, res) => {
         // User not found
         return res.status(401).json({ error: 'Invalid email or password' });
       }
-  
-      const hashedPassword = result[0].password;
+
+      console.log("result is : ");
+      console.log(result);
+      const hashedPassword = result.rows[0].password;
   
       // Compare the inputted password with the hashed password
       bcrypt.compare(password, hashedPassword, (err, passwordMatch) => {
@@ -205,10 +219,10 @@ app.post('/user/login', (req, res) => {
         }
   
 
-        req.session.userId = result[0].id;
+        req.session.userId = result.rows[0].id;
 
         // Authentication successful, generate JWT token
-        const token = generateToken(result[0].id);
+        const token = generateToken(result.rows[0].id);
   
         // Set the token as a cookie
         res.cookie('token', token, { maxAge: 3600000, httpOnly: true });
@@ -228,7 +242,7 @@ app.post('/user/login', (req, res) => {
     const userId = req.session.userId; // Access the userId from the authenticated user's session
   
 
-    const sql = "INSERT INTO todos (title, content, users_id) VALUES (?,?, ?)";
+    const sql = `INSERT INTO todos (title, content, users_id) VALUES ($1,$2,$3);`;
     const values = [title,content, userId];
   
     db.query(sql, values, (err, result) => {
@@ -246,7 +260,7 @@ app.post("/todo/update/:id", (req, res) => {
     const id = req.params.id;
     const title = req.body.title;
     const content = req.body.content;
-    const sql = "UPDATE todos SET title = ? , content = ? WHERE id = ?"
+    const sql = `UPDATE todos SET title = $1 , content = $2 WHERE id = $3;`;
     db.query(sql, [title,content, id], (err, result) => {
         if (err) {
             console.log(err);
@@ -259,13 +273,13 @@ app.post("/todo/update/:id", (req, res) => {
 
 app.get("/todo/edit/:id", (req, res) => {
     const id = req.params.id;
-    const sql = "SELECT * FROM todos WHERE id = ?";
+    const sql = `SELECT * FROM todos WHERE id = $1;`;
     db.query(sql, [id], (err, result) => {
         if (err) {
             console.log(err);
             return res.status(500).json({ error: "Error executing MySQL query" });
         }
-        if (result.length === 0) {
+        if (result.rows[0].length === 0) {
             return res.status(404).json({ error: "Todo not found" });
         }
         res.render("todo-edit", { todo: result[0] });
@@ -274,7 +288,7 @@ app.get("/todo/edit/:id", (req, res) => {
 
 app.get("/todo/delete/:id", (req, res) => {
     const id = req.params.id;
-    const sql = "DELETE FROM todos WHERE id = ?";
+    const sql = `DELETE FROM todos WHERE id = $1;`;
     db.query(sql, [id], (err, result) => {
         if (err) {
             console.log(err);

@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "engines":{
-    "node":"20.x"
+  "engines": {
+    "node": "20.x"
   },
   "scripts": {
     "start": "node src/index.js -e js,hbs",
@@ -22,6 +22,7 @@
     "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.0",
-    "mysql": "^2.18.1"
+    "nodemon": "^3.1.0",
+    "pg": "^8.11.5"
   }
 }
