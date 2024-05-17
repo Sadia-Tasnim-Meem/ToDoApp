@@ -86,6 +86,7 @@ db.connect(err => {
 
 app.get("/", (req, res) => {
     res.redirect("/home");
+    //res.send("Express on Vercel");
   });
 
 
@@ -301,9 +302,11 @@ app.get("/todo/delete/:id", (req, res) => {
 
 //app.listen(5000,'localhost');
 
-app.get("/", (req, res) => res.send("Express on Vercel"));
+//app.get("/", (req, res) => res.send("Express on Vercel"));
 
 
 app.listen(port, () => {
     console.log('port connected');
 })
+
+module.exports = app;
