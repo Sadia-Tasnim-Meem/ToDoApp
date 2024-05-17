@@ -85,8 +85,8 @@ db.connect(err => {
 
 
 app.get("/", (req, res) => {
-    //res.redirect("/home");
-    res.send("Express on Vercel");
+    res.redirect("/home");
+    //res.send("Express on Vercel");
   });
 
 
